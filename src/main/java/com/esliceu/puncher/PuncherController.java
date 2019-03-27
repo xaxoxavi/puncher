@@ -24,20 +24,14 @@ public class PuncherController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public ResponseEntity handleFileUpload(@RequestParam("file") MultipartFile file) {
 
-        if (!file.isEmpty()) {
-            try {
-
-                parserProcessor.process(new ByteContainer(file.getBytes()));
-
-                return new ResponseEntity(HttpStatus.OK);
-
-            } catch (Exception ex) {
-
-            }
-
+        if (file.isEmpty()) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
-
+        try {
+            parserProcessor.process(new ByteContainer(file.getBytes()));
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
     }
 }

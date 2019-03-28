@@ -1,55 +1,21 @@
 package com.esliceu.puncher.data.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
-public class Student {
+@DiscriminatorValue("2")
+@Table(name = "Student")
+public class Student extends User {
 
-    @Id
-    @Column(length = 50)
-    private String code;
-
-    private String name;
-    private String firstSurname;
-    private String secondSurname;
+    @OneToMany(mappedBy = "student")
+    private Set<StudentSession> studentSessions;
 
     @ManyToOne
-    @JoinColumn(name = "grupo_code")
-    private Group group;
+    @JoinColumn(name = "group_code")
+    private Group group; //Grupo
 
     public Student() {}
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFirstSurname() {
-        return firstSurname;
-    }
-
-    public void setFirstSurname(String firstSurname) {
-        this.firstSurname = firstSurname;
-    }
-
-    public String getSecondSurname() {
-        return secondSurname;
-    }
-
-    public void setSecondSurname(String secondSurname) {
-        this.secondSurname = secondSurname;
-    }
 
     public Group getGroup() {
         return group;
@@ -57,5 +23,13 @@ public class Student {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public Set<StudentSession> getStudentSessions() {
+        return studentSessions;
+    }
+
+    public void setStudentSessions(Set<StudentSession> studentSessions) {
+        this.studentSessions = studentSessions;
     }
 }

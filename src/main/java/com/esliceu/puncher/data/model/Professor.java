@@ -1,57 +1,20 @@
 package com.esliceu.puncher.data.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
-public class Professor {
+@DiscriminatorValue("1")
+@Table(name = "Professor")
+public class Professor extends User {
 
-    @Id
-    @Column(length = 50)
-    private String code;
-
-    private String name;
-    private String firstSurname;
-    private String secondSurname;
+    @OneToMany(mappedBy = "professor")
+    private Set<ProfessorSession> professorSessions;
 
     @OneToOne
-    private Group group;
+    private Group group; //Si es Tutor
 
     public Professor() {}
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFirstSurname() {
-        return firstSurname;
-    }
-
-    public void setFirstSurname(String firstSurname) {
-        this.firstSurname = firstSurname;
-    }
-
-    public String getSecondSurname() {
-        return secondSurname;
-    }
-
-    public void setSecondSurname(String secondSurname) {
-        this.secondSurname = secondSurname;
-    }
 
     public Group getGroup() {
         return group;
@@ -59,5 +22,23 @@ public class Professor {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    @Override
+    public String getCode() {
+        return super.getCode();
+    }
+
+    @Override
+    public void setCode(String code) {
+        super.setCode(code);
+    }
+
+    public Set<ProfessorSession> getProfessorSessions() {
+        return professorSessions;
+    }
+
+    public void setProfessorSessions(Set<ProfessorSession> professorSessions) {
+        this.professorSessions = professorSessions;
     }
 }

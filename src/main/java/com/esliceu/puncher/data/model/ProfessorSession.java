@@ -35,8 +35,6 @@ public class ProfessorSession {
 
 
 
-
-
     public ProfessorSession() {}
 
     public String getDay() {

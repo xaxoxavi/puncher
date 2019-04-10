@@ -6,14 +6,10 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 @Entity
-public class StudentSession {
+@DiscriminatorValue("2")
+public class StudentSession extends Session{
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
 
-    @ManyToOne
-    private Student student;
 
     @ManyToOne
     private Subject subject;
@@ -41,22 +37,6 @@ public class StudentSession {
 
     public void setStartHour(String startHour) {
         this.startHour = startHour;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Subject getSubject() {

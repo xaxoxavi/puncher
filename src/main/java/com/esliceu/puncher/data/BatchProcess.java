@@ -184,7 +184,7 @@ public class BatchProcess {
                     professorSession.setGroup(group);
 
                     Professor professor = professorById.get(teachersSession.getProfessorCode());
-                    professorSession.setProfessor(professor);
+                    professorSession.setUser(professor);
 
                     sessionProfessorRepository.save(professorSession);
                 }
@@ -221,7 +221,7 @@ public class BatchProcess {
 
 
                 Student student = studentByCode.get(studentSession.getStudentCode());
-                studentSessionDB.setStudent(student);
+                studentSessionDB.setUser(student);
 
                 com.esliceu.puncher.data.model.Subject subject = subjectById.get(studentSession.getSubmateria());
                 studentSessionDB.setSubject(subject);

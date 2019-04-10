@@ -8,7 +8,7 @@ import java.util.Set;
 @Table(name = "Professor")
 public class Professor extends User {
 
-    @OneToMany(mappedBy = "professor")
+    @OneToMany(mappedBy = "user")
     private Set<ProfessorSession> professorSessions;
 
     @OneToOne

@@ -3,7 +3,6 @@ package com.esliceu.puncher.parser;
 import com.esliceu.puncher.data.BatchProcess;
 import com.esliceu.puncher.parser.model.Center;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -14,14 +13,12 @@ import java.util.concurrent.Future;
 public class ParserProcessor {
 
     private final BatchProcess batchProcess;
-    private final TaskExecutor taskExecutor;
     private final XMLParser xmlParser;
 
     @Autowired
-    public ParserProcessor(TaskExecutor taskExecutor,
+    public ParserProcessor(
                            XMLParser xmlParser,
                            BatchProcess batchProcess){
-        this.taskExecutor = taskExecutor;
         this.xmlParser = xmlParser;
         this.batchProcess = batchProcess;
     }

@@ -1,4 +1,4 @@
-package com.esliceu.puncher.repositories;
+package com.esliceu.puncher.data.repository;
 
 import com.esliceu.puncher.data.model.User;
 import org.springframework.data.repository.CrudRepository;

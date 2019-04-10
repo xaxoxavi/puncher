@@ -2,7 +2,7 @@ package com.esliceu.puncher.controller;
 
 import com.esliceu.puncher.controller.model.AssignmentContainer;
 import com.esliceu.puncher.data.model.User;
-import com.esliceu.puncher.repositories.UserRepository;
+import com.esliceu.puncher.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

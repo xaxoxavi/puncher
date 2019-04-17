@@ -3,6 +3,7 @@ package com.esliceu.puncher.data.model;
 import javax.persistence.*;
 import java.util.Date;
 
+// TODO: Make a constructor that accepts a SigningRequest as a parameter in order to set the values
 @Entity //Unir con los fixajes con los ProfessorSession.
 public class Signing {
 

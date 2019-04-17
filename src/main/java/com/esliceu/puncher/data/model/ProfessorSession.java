@@ -6,15 +6,8 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 @Entity
-public class ProfessorSession {
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "professor_code")
-    private Professor professor;
+@DiscriminatorValue("1")
+public class ProfessorSession extends Session{
 
     @ManyToOne
     @JoinColumn(name = "grupo_code")
@@ -55,13 +48,7 @@ public class ProfessorSession {
         this.startHour = startHour;
     }
 
-    public Professor getProfessor() {
-        return professor;
-    }
 
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
 
     public Group getGroup() {
         return group;
@@ -69,14 +56,6 @@ public class ProfessorSession {
 
     public void setGroup(Group group) {
         this.group = group;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Course getCourse() {

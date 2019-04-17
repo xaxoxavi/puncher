@@ -1,6 +1,7 @@
 package com.esliceu.puncher.data.model;
 
 import javax.persistence.*;
+import java.util.Date;
 
 // TODO: Make a constructor that accepts a SigningRequest as a parameter in order to set the values
 @Entity //Unir con los fixajes con los ProfessorSession.
@@ -18,7 +19,7 @@ public class Signing {
     private String type;
 
     @Column(nullable = false)
-    private String date;
+    private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Reader reader;
@@ -28,7 +29,7 @@ public class Signing {
 
     public Signing() {}
 
-    public Signing(String type, String date, Reader reader, User user) {
+    public Signing(String type, Date date, Reader reader, User user) {
         this.type = type;
         this.date = date;
         this.reader = reader;
@@ -51,11 +52,11 @@ public class Signing {
         this.type = type;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

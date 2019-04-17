@@ -7,11 +7,14 @@ import com.esliceu.puncher.data.model.Reader;
 import com.esliceu.puncher.data.model.Signing;
 import com.esliceu.puncher.data.model.User;
 
+
 // Repository
 import com.esliceu.puncher.data.repository.SigningRepository;
 import com.esliceu.puncher.repositories.UserRepository;
 
-// HTTP stuff
+import com.esliceu.puncher.data.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

@@ -18,19 +18,13 @@ public class Absence {
     private boolean isValidated = false;
 
     @ManyToOne
-    private Subject subject;
+    private Session session;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Absence() {}
 
-    public Absence(String date, String hour, Subject subject, User user) {
-        this.date = date;
-        this.hour = hour;
-        this.subject = subject;
-        this.user = user;
-    }
 
     public void setDate(String date) {
         this.date = date;
@@ -44,9 +38,6 @@ public class Absence {
         this.id = id;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
 
     public void setUser(User user) {
         this.user = user;
@@ -64,9 +55,7 @@ public class Absence {
         return hour;
     }
 
-    public Subject getSubject() {
-        return subject;
-    }
+
 
     public boolean isValidated() {
         return isValidated;
@@ -76,14 +65,12 @@ public class Absence {
         isValidated = validated;
     }
 
-    @Override
-    public String toString() {
-        return "Absence{" +
-                "id=" + id +
-                ", date='" + date + '\'' +
-                ", hour='" + hour + '\'' +
-                ", subject=" + subject +
-                ", user=" + user +
-                '}';
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 }

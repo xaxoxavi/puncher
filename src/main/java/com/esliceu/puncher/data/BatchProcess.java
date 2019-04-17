@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Component
@@ -38,30 +37,39 @@ public class BatchProcess {
     private TimeParser timeCalculator;
 
 
-
-    public void process(Center center){
+    public void process(Center center) {
 
         Map<String, com.esliceu.puncher.data.model.Group> groupsTutor = new HashMap<>();
 
+        Map<Integer, com.esliceu.puncher.data.model.Course> courseById = new HashMap<>();
+        Map<Integer, com.esliceu.puncher.data.model.Group> groupsById = new HashMap<>();
+        Map<String, com.esliceu.puncher.data.model.Professor> professorById = new HashMap<>();
+        Map<Integer, Subject> subjectById = new HashMap<>();
+        Map<Long, Student> studentById = new HashMap<>();
+        Map<String, Student> studentByCode = new HashMap<>();
+
 
         // Sacar los cursos, cada uno de los grupos que tienen esos cursos y meterlos en la base de datos
-        for (Courses courses : center.getCourses()){
+        for (Courses courses : center.getCourses()) {
 
-            for (com.esliceu.puncher.parser.model.Course course : courses.getCourses()){
+            for (com.esliceu.puncher.parser.model.Course course : courses.getCourses()) {
 
                 com.esliceu.puncher.data.model.Course courseDB = new com.esliceu.puncher.data.model.Course();
                 courseDB.setCode(course.getCodi());
                 courseDB.setDescription(course.getDescripcio());
-                courseRepository.save(courseDB);
+                courseDB = courseRepository.save(courseDB);
+                courseById.put(courseDB.getCode(), courseDB);
 
-                for (com.esliceu.puncher.parser.model.Group group : course.getGroups()){
+                for (com.esliceu.puncher.parser.model.Group group : course.getGroups()) {
 
                     com.esliceu.puncher.data.model.Group groupDb = new com.esliceu.puncher.data.model.Group();
                     groupDb.setCode(group.getCode());
                     groupDb.setName(group.getName());
                     groupDb.setCourse(courseDB);
                     groupDb = groupRepository.save(groupDb);
+
                     groupsTutor.put(group.getTutor(), groupDb);
+                    groupsById.put(groupDb.getCode(), groupDb);
 
                 }
 
@@ -74,21 +82,23 @@ public class BatchProcess {
 
         //Sacar todas las asignaturas y guardarlas en la base de datos
 
-        for (Subjects subjects : center.getSubjects()){
-            for (com.esliceu.puncher.parser.model.Subject subject : subjects.getSubjects()){
+        for (Subjects subjects : center.getSubjects()) {
+            for (com.esliceu.puncher.parser.model.Subject subject : subjects.getSubjects()) {
                 Subject subjectDB = new Subject();
                 subjectDB.setCode(subject.getCodi());
                 subjectDB.setDescription(subject.getDescripcio());
-                Optional<com.esliceu.puncher.data.model.Course> course = courseRepository.findById(subject.getCurs());
-                course.ifPresent(subjectDB::setCourse);
-                subjectRepository.save(subjectDB);
+                com.esliceu.puncher.data.model.Course course = courseById.get(subject.getCurs());
+                subjectDB.setCourse(course);
+
+                subjectDB = subjectRepository.save(subjectDB);
+
+                subjectById.put(subjectDB.getCode(), subjectDB);
 
 
             }
         }
 
         System.out.println("Asignaturas añadidas");
-
 
 
         //Sacar todos los professores y  guardarlos en la base de datos
@@ -103,7 +113,8 @@ public class BatchProcess {
                 professor.setSecondSurname(teacher.getFirstSurname());
                 professor.setGroup(groupsTutor.get(teacher.getCode()));
 
-                professorRepository.save(professor);
+                professor = professorRepository.save(professor);
+                professorById.put(professor.getCode(), professor);
 
             }
 
@@ -125,59 +136,77 @@ public class BatchProcess {
                 student.setSecondSurname(center.getAlumnes().get(i).getStudents().get(j).getSecondSurname());
 
                 //Recupera el grupo ya creado anteriormente que tenga el mismo numero que el grupo del usuario
-                com.esliceu.puncher.data.model.Group auxGroup = groupRepository.findById(center.getAlumnes().get(i).getStudents().get(j).getGroupCode()).get();
+                com.esliceu.puncher.data.model.Group auxGroup = groupsById.get(center.getAlumnes().get(i).getStudents().get(j).getGroupCode());
                 student.setGroup(auxGroup);
 
-                studentRepository.save(student);
+                student = studentRepository.save(student);
+
+                studentById.put(student.getId(), student);
+                studentByCode.put(student.getCode(), student);
+
             }
         }
 
         System.out.println("Estudiantes añadidos");
 
 
-        //Sacar todos las sessiones de professores y  guardarlos en la base de datos
+        Thread thread = new Thread(() -> {
 
-        for (ScheduleTeachers scheduleTeachers : center.getScheduleTeachers()){
-            for (TeachersSession teachersSession: scheduleTeachers.getTeachersSessions()){
+            for (ScheduleTeachers scheduleTeachers : center.getScheduleTeachers()) {
 
-                ProfessorSession professorSession = new ProfessorSession();
-                professorSession.setDay(teachersSession.getDay());
+                int cont = 0;
+                for (TeachersSession teachersSession : scheduleTeachers.getTeachersSessions()) {
 
-                String startHour = teachersSession.getHour();
-                professorSession.setStartHour(startHour);
+                    cont++;
 
-                Integer durada = teachersSession.getDurada();
-                professorSession.setDurada(durada);
+                    if (cont % 1000 ==  0) System.out.println("TeachersSession: " + cont + "/" + scheduleTeachers.getTeachersSessions().size() );
 
-                DateTime endDate = timeCalculator.addTime(durada,startHour);
-                String endHour = timeCalculator.formatTime(endDate);
-                professorSession.setEndHour(endHour);
+                    ProfessorSession professorSession = new ProfessorSession();
+                    professorSession.setDay(teachersSession.getDay());
 
-                Optional<com.esliceu.puncher.data.model.Course> course = courseRepository.findById(teachersSession.getCurs());
-                course.ifPresent(professorSession::setCourse);
-               
-                Optional<com.esliceu.puncher.data.model.Subject> subject = subjectRepository.findById(teachersSession.getSubmateria());
-                subject.ifPresent(professorSession::setSubject);
+                    String startHour = teachersSession.getHour();
+                    professorSession.setStartHour(startHour);
 
-                Optional<com.esliceu.puncher.data.model.Group> group = groupRepository.findById(teachersSession.getGroupCode());
-                group.ifPresent(professorSession::setGroup);
+                    Integer durada = teachersSession.getDurada();
+                    professorSession.setDurada(durada);
 
-                Optional<Professor> professor = professorRepository.findById(teachersSession.getProfessorCode());
-                professor.ifPresent(professorSession::setProfessor);
+                    DateTime endDate = timeCalculator.addTime(durada, startHour);
+                    String endHour = timeCalculator.formatTime(endDate);
+                    professorSession.setEndHour(endHour);
 
-                sessionProfessorRepository.save(professorSession);
+                    com.esliceu.puncher.data.model.Course course = courseById.get(teachersSession.getCurs());
+                    professorSession.setCourse(course);
+
+                    com.esliceu.puncher.data.model.Subject subject = subjectById.get(teachersSession.getSubmateria());
+                    professorSession.setSubject(subject);
+
+                    com.esliceu.puncher.data.model.Group group = groupsById.get(teachersSession.getGroupCode());
+                    professorSession.setGroup(group);
+
+                    Professor professor = professorById.get(teachersSession.getProfessorCode());
+                    professorSession.setUser(professor);
+
+                    sessionProfessorRepository.save(professorSession);
+                }
+
             }
+            System.out.println("Sessiones de profe añadidos");
 
         }
 
+        );
 
-        System.out.println("Sessiones de profe añadidos");
+        thread.start();
 
 
         //Sacar todos las sessiones de estudiantes y  guardarlos en la base de datos
 
-        for(ScheduleStudents scheduleStudents : center.getScheduleStudents()){
-            for(com.esliceu.puncher.parser.model.StudentSession studentSession : scheduleStudents.getStudentSessions()){
+        for (ScheduleStudents scheduleStudents : center.getScheduleStudents()) {
+            int cont = 0;
+            for (com.esliceu.puncher.parser.model.StudentSession studentSession : scheduleStudents.getStudentSessions()) {
+
+                cont ++;
+                if (cont % 1000 == 0) System.out.println("StudentSession: " + cont + "/" + scheduleStudents.getStudentSessions().size() );
 
                 com.esliceu.puncher.data.model.StudentSession studentSessionDB = new com.esliceu.puncher.data.model.StudentSession();
                 studentSessionDB.setDay(studentSession.getDay());
@@ -186,16 +215,16 @@ public class BatchProcess {
                 Integer durada = studentSession.getDurada();
                 studentSessionDB.setDurada(durada);
 
-                DateTime endDate = timeCalculator.addTime(durada,startHour);
+                DateTime endDate = timeCalculator.addTime(durada, startHour);
                 String endHour = timeCalculator.formatTime(endDate);
                 studentSessionDB.setEndHour(endHour);
-                String studentCode = studentSession.getStudentCode();
 
-                Optional<Student> student = studentRepository.findById(studentCode);
-                student.ifPresent(studentSessionDB::setStudent);
 
-                Optional<com.esliceu.puncher.data.model.Subject> subject = subjectRepository.findById(studentSession.getSubmateria());
-                subject.ifPresent(studentSessionDB::setSubject);
+                Student student = studentByCode.get(studentSession.getStudentCode());
+                studentSessionDB.setUser(student);
+
+                com.esliceu.puncher.data.model.Subject subject = subjectById.get(studentSession.getSubmateria());
+                studentSessionDB.setSubject(subject);
 
                 sessionStudentRepository.save(studentSessionDB);
 
@@ -206,8 +235,8 @@ public class BatchProcess {
 
         //Sacar todas las aulas del centro y guardarlas en la base de datos
 
-        for ( Classrooms classrooms : center.getClassrooms()){
-            for( Classroom classroom : classrooms.getClassrooms()){
+        for (Classrooms classrooms : center.getClassrooms()) {
+            for (Classroom classroom : classrooms.getClassrooms()) {
 
                 SchoolRoom schoolRoom = new SchoolRoom();
                 schoolRoom.setCode(classroom.getCodi());
@@ -216,6 +245,6 @@ public class BatchProcess {
 
             }
         }
-        
+
     }
 }

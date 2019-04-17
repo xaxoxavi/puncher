@@ -11,7 +11,7 @@ public class StudentSession {
     //xml: ScheduleStudents Session
 
     @XmlAttribute(name="alumne")
-    private String StudentCode;
+    private String studentCode;
     @XmlAttribute(name="dia")
     private Integer day;
     @XmlAttribute(name="hora")
@@ -23,11 +23,11 @@ public class StudentSession {
 
 
     public String getStudentCode() {
-        return StudentCode;
+        return studentCode;
     }
 
     public void setStudentCode(String studentCode) {
-        StudentCode = studentCode;
+        this.studentCode = studentCode;
     }
 
     public Integer getDay() {

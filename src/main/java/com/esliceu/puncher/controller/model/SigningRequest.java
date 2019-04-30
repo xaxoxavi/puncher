@@ -1,8 +1,11 @@
 package com.esliceu.puncher.controller.model;
 
+import java.util.Date;
+
 public class SigningRequest {
     private String rfid;
     private String idMachine;
+    private Date signingDate;
 
     public SigningRequest() {
 
@@ -27,5 +30,13 @@ public class SigningRequest {
 
     public void setIdMachine(String idMachine) {
         this.idMachine = idMachine;
+    }
+
+    public Date getSigningDate() {
+        return signingDate;
+    }
+
+    public void setSigningDate(Date signingDate) {
+        this.signingDate = signingDate;
     }
 }

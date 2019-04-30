@@ -3,7 +3,7 @@ package com.esliceu.puncher.controller.model;
 public class AssignmentContainer {
 
     private String rfid;
-    private Integer userId;
+    private Long userId;
 
     public String getRfid() {
         return rfid;
@@ -13,11 +13,11 @@ public class AssignmentContainer {
         this.rfid = rfid;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }

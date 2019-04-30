@@ -1,32 +1,30 @@
 package com.esliceu.puncher.controller;
 
 // Models
+
 import com.esliceu.puncher.controller.model.AssignmentContainer;
 import com.esliceu.puncher.controller.model.SigningRequest;
+import com.esliceu.puncher.controller.model.SigningResponse;
+import com.esliceu.puncher.controller.model.Status;
 import com.esliceu.puncher.data.model.Reader;
 import com.esliceu.puncher.data.model.Signing;
 import com.esliceu.puncher.data.model.User;
-
-
-// Repository
 import com.esliceu.puncher.data.repository.SigningRepository;
-import com.esliceu.puncher.repositories.UserRepository;
-
 import com.esliceu.puncher.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-// Annotations
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+// Repository
+// Annotations
 
 @RestController
 public class RFIDOperations {
@@ -49,23 +47,28 @@ public class RFIDOperations {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/signings/validate", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity validate(@RequestBody SigningRequest signingRequest) {
+    @RequestMapping(value = "/signings", method = RequestMethod.POST, consumes = "application/json")
+    public ResponseEntity<SigningResponse> validate(@RequestBody SigningRequest signingRequest) {
         User user = userRepository.findByRfid(signingRequest.getRfid());
 
         // The user is not valid AKA null
         if (user == null) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SigningResponse(Status.KO,"picture","Marcatge no vàlid"),HttpStatus.BAD_REQUEST);
+        }
+
+        if (signingRequest.getSigningDate() == null){
+            signingRequest.setSigningDate(new Date());
+
         }
 
         // These values must come from SigningRequest class
         String signingType = "";
-        String signingDate = "";
+
         Reader reader = null;
 
-        Signing signing = new Signing(signingType, signingDate, reader, user);
+        Signing signing = new Signing(signingType, signingRequest.getSigningDate(), reader, user);
         signingRepository.save(signing);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(new SigningResponse(Status.OK,"picture","Marcatge vàlid"),HttpStatus.OK);
     }
 
 

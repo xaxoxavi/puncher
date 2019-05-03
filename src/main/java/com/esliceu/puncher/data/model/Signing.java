@@ -25,6 +25,7 @@ public class Signing {
     private Reader reader;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
 
     public Signing() {}

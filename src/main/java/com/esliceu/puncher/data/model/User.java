@@ -22,7 +22,7 @@ public class User {
 
     private String rfid;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Signing> signing;
 
     @OneToMany(mappedBy = "user")
